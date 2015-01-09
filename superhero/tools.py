@@ -17,20 +17,16 @@ class SuperheroImport(object_tools.ObjectTool):
     help_text = _("Import a superhero bundle.")
     form_class = ImportForm
 
-    #def save_data(self, data):
-    #    pass
-
-    def handle_import(self, form):
-        #csv_file = form.files['csv_file']
-        #self.save_data(data_dict)
-        pass
-
     def view(self, request, extra_context=None, process_form=True):
         form = extra_context["form"]
 
         if form.is_valid() and process_form:
-            self.handle_import(form)
-            message = _("The superhero bundle has been successfully imported.")
+            superheroes = form.save()
+            n = len(superheroes)
+            if n == 1:
+                message = _("The superhero bundle has been imported successfully.")
+            else:
+                message = _("%s superhero bundles have been imported successfully." % n)
             messages.add_message(request, messages.SUCCESS, message)
 
         adminform = helpers.AdminForm(form, form.fieldsets, {})
