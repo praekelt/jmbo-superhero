@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.shortcuts import render_to_response
 from django.utils.translation import ugettext as _
-from django.conf import settings
 
 import object_tools
 
@@ -24,9 +23,13 @@ class SuperheroImport(object_tools.ObjectTool):
             superheroes = form.save()
             n = len(superheroes)
             if n == 1:
-                message = _("The superhero bundle has been imported successfully.")
+                message = _(
+                    "The superhero bundle has been imported successfully."
+                )
             else:
-                message = _("%s superhero bundles have been imported successfully." % n)
+                message = _(
+                    "%s superhero bundles have been imported successfully." % n
+                )
             messages.add_message(request, messages.SUCCESS, message)
 
         adminform = helpers.AdminForm(form, form.fieldsets, {})

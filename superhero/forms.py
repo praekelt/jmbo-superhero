@@ -1,7 +1,6 @@
 import os
 import zipfile
 from StringIO import StringIO
-from tempfile import mkdtemp
 import shutil
 
 from django import forms
@@ -17,8 +16,11 @@ class ImportForm(forms.Form):
     files = FileMultiField(
         required=True,
         label=_("Zip file(s)"),
-        help_text=_("""One or more zip files containing HTML, CSS, Javascript \
-and images. The top level of the zip file must contain an index.html else it is omitted.""")
+        help_text=_(
+            """One or more zip files containing HTML, CSS, Javascript and
+            images. The top level of the zip file must contain an index.html
+            else it is omitted."""
+        )
     )
 
     def __init__(self, model, *args, **kwargs):
@@ -33,7 +35,6 @@ and images. The top level of the zip file must contain an index.html else it is 
         if self.cleaned_data["files"]:
             for item in self.cleaned_data["files"]:
                 item.seek(0)
-                to_add = []
 
                 # Zip file?
                 itemfp = StringIO(item.read())

@@ -9,7 +9,9 @@ from superhero.widgets import FileMultiInput
 class FileMultiField(FileField):
     widget = FileMultiInput
     default_error_messages = FileField.default_error_messages.copy()
-    default_error_messages['max_size'] = _(u'All uploaded files must be smaller than %(max_size)s bytes.')
+    default_error_messages['max_size'] = _(
+        u'All uploaded files must be smaller than %(max_size)s bytes.'
+    )
 
     def __init__(self, *args, **kwargs):
         self.max_size = kwargs.pop('max_size', None)
@@ -28,11 +30,18 @@ class FileMultiField(FileField):
                 raise ValidationError(self.error_messages['invalid'])
 
             if self.max_length is not None and len(file_name) > self.max_length:
-                error_values =  {'max': self.max_length, 'length': len(file_name)}
-                raise ValidationError(self.error_messages['max_length'] % error_values)
+                error_values = {
+                    'max': self.max_length,
+                    'length': len(file_name)
+                }
+                raise ValidationError(
+                    self.error_messages['max_length'] % error_values
+                )
             if self.max_size is not None and file_size > self.max_size:
-                error_values =  {'max_size': self.max_size}
-                raise ValidationError(self.error_messages['max_size'] % error_values)
+                error_values = {'max_size': self.max_size}
+                raise ValidationError(
+                    self.error_messages['max_size'] % error_values
+                )
             if not file_name:
                 raise ValidationError(self.error_messages['invalid'])
             if not file_size:
