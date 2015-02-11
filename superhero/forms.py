@@ -12,7 +12,7 @@ from superhero.fields import FileMultiField
 from superhero.models import Superhero
 
 
-class ImportForm(forms.Form):
+class ImportForm(forms.ModelForm):
     files = FileMultiField(
         required=True,
         label=_("Zip file(s)"),
@@ -23,17 +23,13 @@ class ImportForm(forms.Form):
         )
     )
 
-    def __init__(self, model, *args, **kwargs):
-        super(ImportForm, self).__init__(*args, **kwargs)
-        self.fieldsets = (
-            (_("Import"), {"fields": ("files", )}),
-        )
+    class Meta:
+        model = Superhero
 
-    def save(self, commit=True):
-        result = []
-
+    def save(self, *args, **kwargs):
+        initial_obj = super(ImportForm, self).save(*args, **kwargs)
         if self.cleaned_data["files"]:
-            for item in self.cleaned_data["files"]:
+            for count, item in enumerate(self.cleaned_data["files"]):
                 item.seek(0)
 
                 # Zip file?
@@ -46,8 +42,9 @@ class ImportForm(forms.Form):
                     continue
                 else:
                     if not zfp.testzip():
+                        print zfp.namelist()
                         # Skip if index.html not in top level of archive
-                        if "index.html" not in zfp.namelist():
+                        if not [n for n in zfp.namelist() if "index.html" in n]:
                             continue
 
                         # Ensure superhero directory exists
@@ -65,16 +62,19 @@ class ImportForm(forms.Form):
 
                         zfp.extractall(path=target)
 
-                        # Create or update object
-                        try:
-                            obj = Superhero.objects.get(name=name)
-                        except Superhero.DoesNotExist:
-                            obj = Superhero.objects.create(
-                                title=name.capitalize(), name=name
-                            )
-                            obj.sites = Site.objects.all()
-                            obj.save()
+                        # Create or update object utilising the initial obj
+                        # first
+                        if not count:
+                            initial_obj.title = name.capitalize()
+                            initial_obj.name = name
+                        else:
+                            try:
+                                obj = Superhero.objects.get(name=name)
+                            except Superhero.DoesNotExist:
+                                obj = Superhero.objects.create(
+                                    title=name.capitalize(), name=name
+                                )
+                                obj.sites = Site.objects.all()
+                                obj.save()
 
-                        result.append(obj)
-
-        return result
+        return super(ImportForm, self).save(*args, **kwargs)
