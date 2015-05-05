@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='jmbo-superhero',
-    version='0.3',
+    version='0.1',
     description='Jmbo superhero application.  A content type that represents a bundle of HTML, JS and CSS on the filesystem.',
     long_description = open('README.rst', 'r').read() + open('AUTHORS.rst', 'r').read() + open('CHANGELOG.rst', 'r').read(),
     author='Praekelt Foundation',
